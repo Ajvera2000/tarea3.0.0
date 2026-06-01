@@ -1,0 +1,81 @@
+name: CI/CD Pipeline - ejercicio:3.0.0
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Descargar el código fuente
+    - name: Checkout de código
+      uses: actions/checkout@v4
+
+    # 2. Configurar entorno Python
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # 3. Instalar dependencias
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # 4. Ejecutar pruebas automatizadas
+    - name: Ejecutar pruebas con Pytest
+      run: |
+        pytest
+
+    # 5. Ejecutar la aplicación (Simulación rápida/Chequeo de sintaxis)
+    - name: Verificar ejecución de la aplicación
+      run: |
+        python -c "import app.main; print('Aplicación cargada correctamente')"
+
+    # 6. Simular fase de despliegue
+    - name: Simulación de Despliegue
+      run: |
+        echo "Iniciando fase de despliegue simulada..."
+        echo "Verificando entornos y variables..."
+        echo "¡Despliegue simulado con éxito!"
+
+  docker-build-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout de código
+      uses: actions/checkout@v4
+
+    # 7. Autenticarse en GitHub Container Registry
+    - name: Iniciar sesión en GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Convertir el nombre de usuario a minúsculas para evitar errores en Docker tags
+    - name: Set lower case owner name
+      run: |
+        echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
+      env:
+        OWNER: '${{ github.actor }}'
+
+    # 8. Construir y publicar la imagen Docker
+    - name: Construir y publicar imagen Docker
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ghcr.io/${{ env.OWNER_LC }}/ejercicio:3.0.0
