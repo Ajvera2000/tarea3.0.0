@@ -69,7 +69,7 @@ jobs:
       run: |
         echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
       env:
-        OWNER: '${{ github.actor }
+        OWNER: '${{ github.actor }}'
 
     # 8. Construir y publicar la imagen Docker
     - name: Construir y publicar imagen Docker
