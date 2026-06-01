@@ -23,7 +23,7 @@ jobs:
     - name: Configurar Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.11'
 
     # 3. Instalar dependencias
     - name: Instalar dependencias
@@ -69,7 +69,7 @@ jobs:
       run: |
         echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
       env:
-        OWNER: '${{ github.actor }}'
+        OWNER: '${{ github.actor }
 
     # 8. Construir y publicar la imagen Docker
     - name: Construir y publicar imagen Docker
